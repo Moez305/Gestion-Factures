@@ -20,6 +20,15 @@ const BillItem = sequelize.define('BillItem', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1
+  },
+  unit_price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false
+  },
   price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false

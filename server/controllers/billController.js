@@ -104,7 +104,11 @@ const createBill = async (req, res) => {
     }
 
     // Calculate total
-    const total = items.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    const total = items.reduce((sum, item) => {
+      const quantity = item.quantity || 1;
+      const unitPrice = parseFloat(item.unit_price || item.price);
+      return sum + (quantity * unitPrice);
+    }, 0);
 
     // Create bill
     const bill = await Bill.create({
@@ -115,13 +119,19 @@ const createBill = async (req, res) => {
 
     // Create bill items
     const billItems = await Promise.all(
-      items.map((item) =>
-        BillItem.create({
+      items.map((item) => {
+        const quantity = item.quantity || 1;
+        const unitPrice = parseFloat(item.unit_price || item.price);
+        const totalPrice = quantity * unitPrice;
+        
+        return BillItem.create({
           bill_id: bill.id,
           name: item.name,
-          price: item.price,
-        })
-      )
+          quantity: quantity,
+          unit_price: unitPrice,
+          price: totalPrice,
+        });
+      })
     );
 
     // Return bill with items and client
@@ -155,7 +165,11 @@ const updateBill = async (req, res) => {
     }
 
     // Calculate new total
-    const total = items.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    const total = items.reduce((sum, item) => {
+      const quantity = item.quantity || 1;
+      const unitPrice = parseFloat(item.unit_price || item.price);
+      return sum + (quantity * unitPrice);
+    }, 0);
 
     // Update bill
     await bill.update({
@@ -167,13 +181,19 @@ const updateBill = async (req, res) => {
     await BillItem.destroy({ where: { bill_id: bill.id } });
 
     await Promise.all(
-      items.map((item) =>
-        BillItem.create({
+      items.map((item) => {
+        const quantity = item.quantity || 1;
+        const unitPrice = parseFloat(item.unit_price || item.price);
+        const totalPrice = quantity * unitPrice;
+        
+        return BillItem.create({
           bill_id: bill.id,
           name: item.name,
-          price: item.price,
-        })
-      )
+          quantity: quantity,
+          unit_price: unitPrice,
+          price: totalPrice,
+        });
+      })
     );
 
     // Return updated bill
@@ -296,12 +316,11 @@ const generateBillPDF = async (req, res) => {
       console.log("Logo not found, using fallback");
     }
     
-    // Company name and slogan
-    doc.fontSize(24).font("Helvetica-Bold").text("ORM", logoX + 40, logoY);
+    // Company slogan only (no ORM text, just logo)
     doc
       .fontSize(12)
       .font("Helvetica")
-      .text("réparation et maintenance", logoX + 40, logoY + 25);
+      .text("réparation et maintenance", logoX + 40, logoY + 10);
 
     // Add horizontal line in header
     doc.moveTo(logoX + 150, logoY + 10).lineTo(500, logoY + 10).stroke();
@@ -382,16 +401,20 @@ const generateBillPDF = async (req, res) => {
     // Table content with proper spacing
     let currentY = tableTop + 25;
     bill.BillItems.forEach((item, index) => {
-      doc.fontSize(10).font("Helvetica").text("1", colX[0] + 5, currentY);
+      const quantity = item.quantity || 1;
+      const unitPrice = parseFloat(item.unit_price || item.price);
+      const totalPrice = parseFloat(item.price);
+      
+      doc.fontSize(10).font("Helvetica").text(quantity.toString(), colX[0] + 5, currentY);
       doc.fontSize(10).font("Helvetica").text(item.name, colX[1] + 5, currentY);
       doc
         .fontSize(10)
         .font("Helvetica")
-        .text(`${parseFloat(item.price).toFixed(2)}`, colX[2] + 5, currentY);
+        .text(`${unitPrice.toFixed(2)}`, colX[2] + 5, currentY);
       doc
         .fontSize(10)
         .font("Helvetica")
-        .text(`${parseFloat(item.price).toFixed(2)}`, colX[3] + 5, currentY);
+        .text(`${totalPrice.toFixed(2)}`, colX[3] + 5, currentY);
       currentY += 20;
     });
 
@@ -440,7 +463,7 @@ const generateBillPDF = async (req, res) => {
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text(`${totalTTC.toFixed(2)} dinars`, 50, totalsY + 95);
+      .text(`${totalTTC.toFixed(2)} TND`, 50, totalsY + 95);
 
     // Footer
     doc

@@ -7,7 +7,7 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
     date: initialData?.date
       ? new Date(initialData.date).toISOString().split("T")[0]
       : new Date().toISOString().split("T")[0],
-    items: initialData?.items || [{ name: "", price: "" }],
+    items: initialData?.items || [{ name: "", quantity: "1", unit_price: "", price: "" }],
   });
 
   const handleChange = (e) => {
@@ -29,7 +29,7 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
   const addItem = () => {
     setFormData({
       ...formData,
-      items: [...formData.items, { name: "", price: "" }],
+      items: [...formData.items, { name: "", quantity: "1", unit_price: "", price: "" }],
     });
   };
 
@@ -45,8 +45,9 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
 
   const calculateTotal = () => {
     return formData.items.reduce((sum, item) => {
-      const price = parseFloat(item.price) || 0;
-      return sum + price;
+      const quantity = parseFloat(item.quantity) || 1;
+      const unitPrice = parseFloat(item.unit_price) || 0;
+      return sum + (quantity * unitPrice);
     }, 0);
   };
 
@@ -66,7 +67,7 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
 
     // Validate items
     const validItems = formData.items.filter(
-      (item) => item.name.trim() && item.price
+      (item) => item.name.trim() && item.unit_price
     );
     if (validItems.length === 0) {
       alert("Please add at least one item");
@@ -79,7 +80,8 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
       date: formData.date,
       items: validItems.map((item) => ({
         name: item.name.trim(),
-        price: parseFloat(item.price),
+        quantity: parseInt(item.quantity) || 1,
+        unit_price: parseFloat(item.unit_price),
       })),
     };
 
@@ -168,6 +170,17 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
               }}
             >
               <input
+                type="number"
+                placeholder="QTE"
+                value={item.quantity}
+                onChange={(e) =>
+                  handleItemChange(index, "quantity", e.target.value)
+                }
+                style={{ flex: 0.5 }}
+                min="1"
+                required
+              />
+              <input
                 type="text"
                 placeholder="Item name"
                 value={item.name}
@@ -179,15 +192,23 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
               />
               <input
                 type="number"
-                placeholder="Price"
-                value={item.price}
+                placeholder="P.U HT"
+                value={item.unit_price}
                 onChange={(e) =>
-                  handleItemChange(index, "price", e.target.value)
+                  handleItemChange(index, "unit_price", e.target.value)
                 }
                 style={{ flex: 1 }}
                 step="0.01"
                 min="0"
                 required
+              />
+              <input
+                type="number"
+                placeholder="P.T HT"
+                value={(parseFloat(item.quantity) || 1) * (parseFloat(item.unit_price) || 0)}
+                disabled
+                style={{ flex: 1, backgroundColor: "#f8f9fa" }}
+                step="0.01"
               />
               {formData.items.length > 1 && (
                 <button
@@ -233,7 +254,7 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
             textAlign: "right",
           }}
         >
-          <strong>Total: ${calculateTotal().toFixed(2)}</strong>
+          <strong>Total: {calculateTotal().toFixed(2)} TND</strong>
         </div>
       </div>
 

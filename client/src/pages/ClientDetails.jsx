@@ -125,7 +125,7 @@ const ClientDetails = () => {
               <strong>Total Bills:</strong> {bills.length}
             </p>
             <p>
-              <strong>Total Amount:</strong> ${totalBilled.toFixed(2)}
+              <strong>Total Amount:</strong> {totalBilled.toFixed(2)} TND
             </p>
           </div>
         </div>
@@ -163,7 +163,7 @@ const ClientDetails = () => {
                   <td>{bill.id}</td>
                   <td>{new Date(bill.date).toLocaleDateString()}</td>
                   <td>{bill.BillItems ? bill.BillItems.length : 0} items</td>
-                  <td>${parseFloat(bill.total).toFixed(2)}</td>
+                                     <td>{parseFloat(bill.total).toFixed(2)} TND</td>
                   <td>
                     <button
                       className="btn btn-primary"
