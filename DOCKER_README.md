@@ -4,7 +4,7 @@ This project has been dockerized for easy deployment and development. The applic
 
 - **Frontend**: React application (port 3000)
 - **Backend**: Node.js/Express API (port 5000)
-- **Database**: MySQL 8.0 (port 3306)
+- **Database**: MySQL 8.0 (port 3307)
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ Once all services are running:
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:5000
-- **Database**: localhost:3306
+- **Database**: localhost:3307
 
 ## Environment Configuration
 
@@ -107,7 +107,7 @@ REACT_APP_API_URL=http://localhost:5000
 ### 3. Database (db)
 
 - **Image**: mysql:8.0
-- **Port**: 3306
+- **Port**: 3307
 - **Volume**: mysql_data (persistent storage)
 
 ## Development Workflow
@@ -145,7 +145,7 @@ docker-compose exec db mysql -u billing_user -p client_billing_db
 
 1. **Port already in use:**
 
-   - Stop any existing services using ports 3000, 5000, or 3306
+   - Stop any existing services using ports 3000, 5000, or 3307
    - Or modify the ports in `docker-compose.yml`
 
 2. **Database connection issues:**

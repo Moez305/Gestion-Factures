@@ -1,4 +1,4 @@
-version: "3.8"
+# Docker Compose configuration for Client Billing Application
 
 services:
   # MySQL Database
@@ -12,7 +12,7 @@ services:
       MYSQL_USER: billing_user
       MYSQL_PASSWORD: billing_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:

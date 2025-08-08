@@ -73,7 +73,7 @@
 
 2. **Check if ports are available**
 
-   - Close any other applications that might be using ports 3000, 5000, or 3306
+   - Close any other applications that might be using ports 3000, 5000, or 3307
    - Common culprits: Skype, other web servers, MySQL
 
 3. **Restart Docker Desktop**
@@ -104,7 +104,7 @@
 
 - **Frontend (Port 3000)**: The website you interact with
 - **Backend (Port 5000)**: Handles data and business logic
-- **Database (Port 3306)**: Stores all your data
+- **Database (Port 3307)**: Stores all your data
 
 ## Important Notes
 
