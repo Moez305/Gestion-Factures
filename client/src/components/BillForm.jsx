@@ -190,26 +190,31 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
                 style={{ flex: 2 }}
                 required
               />
-              <input
-                type="number"
-                placeholder="P.U HT"
-                value={item.unit_price}
-                onChange={(e) =>
-                  handleItemChange(index, "unit_price", e.target.value)
-                }
-                style={{ flex: 1 }}
-                step="0.01"
-                min="0"
-                required
-              />
-              <input
-                type="number"
-                placeholder="P.T HT"
-                value={(parseFloat(item.quantity) || 1) * (parseFloat(item.unit_price) || 0)}
-                disabled
-                style={{ flex: 1, backgroundColor: "#f8f9fa" }}
-                step="0.01"
-              />
+                             <input
+                 type="number"
+                 placeholder="P.U HT"
+                 value={item.unit_price}
+                 onChange={(e) =>
+                   handleItemChange(index, "unit_price", e.target.value)
+                 }
+                 style={{ flex: 1 }}
+                 step="0.01"
+                 min="0"
+                 required
+               />
+               <div
+                 style={{
+                   flex: 1,
+                   backgroundColor: "#f8f9fa",
+                   padding: "8px 12px",
+                   border: "1px solid #ddd",
+                   borderRadius: "4px",
+                   textAlign: "center",
+                   color: "#666"
+                 }}
+               >
+                 P.T HT: {((parseFloat(item.quantity) || 1) * (parseFloat(item.unit_price) || 0)).toFixed(2)} TND
+               </div>
               {formData.items.length > 1 && (
                 <button
                   type="button"

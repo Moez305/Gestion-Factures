@@ -107,7 +107,7 @@ const createBill = async (req, res) => {
     const total = items.reduce((sum, item) => {
       const quantity = item.quantity || 1;
       const unitPrice = parseFloat(item.unit_price || item.price);
-      return sum + (quantity * unitPrice);
+      return sum + quantity * unitPrice;
     }, 0);
 
     // Create bill
@@ -123,7 +123,7 @@ const createBill = async (req, res) => {
         const quantity = item.quantity || 1;
         const unitPrice = parseFloat(item.unit_price || item.price);
         const totalPrice = quantity * unitPrice;
-        
+
         return BillItem.create({
           bill_id: bill.id,
           name: item.name,
@@ -168,7 +168,7 @@ const updateBill = async (req, res) => {
     const total = items.reduce((sum, item) => {
       const quantity = item.quantity || 1;
       const unitPrice = parseFloat(item.unit_price || item.price);
-      return sum + (quantity * unitPrice);
+      return sum + quantity * unitPrice;
     }, 0);
 
     // Update bill
@@ -185,7 +185,7 @@ const updateBill = async (req, res) => {
         const quantity = item.quantity || 1;
         const unitPrice = parseFloat(item.unit_price || item.price);
         const totalPrice = quantity * unitPrice;
-        
+
         return BillItem.create({
           bill_id: bill.id,
           name: item.name,
@@ -284,19 +284,19 @@ const generateBillPDF = async (req, res) => {
     // Header Section with Logo
     const logoX = 50;
     const logoY = 50;
-    
+
     // Try to load logo image if it exists
     try {
-      const logoPath = './assets/logo.png';
-      if (require('fs').existsSync(logoPath)) {
-        doc.image(logoPath, logoX, logoY, { width: 50, height: 50 }); // Bigger logo
+      const logoPath = "./assets/logo.png";
+      if (require("fs").existsSync(logoPath)) {
+        doc.image(logoPath, logoX, logoY, { width: 150, height: 70 }); // Bigger logo
       } else {
         // Fallback: Draw gear icon (simplified version)
         const gearRadius = 25; // Bigger gear icon
-        
+
         // Draw gear outline
         doc.circle(logoX + gearRadius, logoY + gearRadius, gearRadius).stroke();
-        
+
         // Draw gear teeth (simplified)
         for (let i = 0; i < 8; i++) {
           const angle = (i * Math.PI) / 4;
@@ -306,7 +306,7 @@ const generateBillPDF = async (req, res) => {
           const y2 = logoY + gearRadius + Math.sin(angle) * (gearRadius + 5);
           doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
         }
-        
+
         // Draw red drop in center
         doc.fillColor("red");
         doc.circle(logoX + gearRadius, logoY + gearRadius, 5).fill();
@@ -315,25 +315,41 @@ const generateBillPDF = async (req, res) => {
     } catch (error) {
       console.log("Logo not found, using fallback");
     }
-    
+
     // No company text, just logo
 
     // Add horizontal line in header
-    doc.moveTo(logoX + 150, logoY + 10).lineTo(500, logoY + 10).stroke();
+    doc
+      .moveTo(logoX + 150, logoY + 10)
+      .lineTo(500, logoY + 10)
+      .stroke();
 
     // Invoice Details Section (Left side)
     const detailsY = 120;
     doc.fontSize(12).font("Helvetica-Bold").text("FACTURE N°:", 50, detailsY);
     doc.fontSize(12).font("Helvetica").text(bill.id.toString(), 150, detailsY);
 
-    doc.fontSize(12).font("Helvetica-Bold").text("DATE:", 50, detailsY + 20);
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("DATE:", 50, detailsY + 20);
     doc
       .fontSize(12)
       .font("Helvetica")
-      .text(new Date(bill.date).toLocaleDateString("fr-FR"), 150, detailsY + 20);
+      .text(
+        new Date(bill.date).toLocaleDateString("fr-FR"),
+        150,
+        detailsY + 20
+      );
 
-    doc.fontSize(12).font("Helvetica-Bold").text("VALIDITE:", 50, detailsY + 40);
-    doc.fontSize(12).font("Helvetica").text("30 jours", 150, detailsY + 40);
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("VALIDITE:", 50, detailsY + 40);
+    doc
+      .fontSize(12)
+      .font("Helvetica")
+      .text("30 jours", 150, detailsY + 40);
 
     // Client Information Section (Right side)
     const clientBoxX = 350;
@@ -361,8 +377,12 @@ const generateBillPDF = async (req, res) => {
     doc.font("Helvetica").text("", clientBoxX + 40, clientBoxY + 55);
 
     // Client Code
-    doc.font("Helvetica-Bold").text("CODE CLIENT:", clientBoxX + 10, clientBoxY + 75);
-    doc.font("Helvetica").text(bill.Client.code, clientBoxX + 90, clientBoxY + 75);
+    doc
+      .font("Helvetica-Bold")
+      .text("CODE CLIENT:", clientBoxX + 10, clientBoxY + 75);
+    doc
+      .font("Helvetica")
+      .text(bill.Client.code, clientBoxX + 90, clientBoxY + 75);
 
     // Items Table with proper borders - exactly like template
     const tableTop = detailsY + 120;
@@ -372,21 +392,41 @@ const generateBillPDF = async (req, res) => {
     const colX = [50, 110, 360, 440];
 
     // Draw main table border
-    doc.rect(tableLeft, tableTop - 10, tableRight - tableLeft, tableHeight).stroke();
+    doc
+      .rect(tableLeft, tableTop - 10, tableRight - tableLeft, tableHeight)
+      .stroke();
 
     // Table headers
-    doc.fontSize(10).font("Helvetica-Bold").text("QTE", colX[0] + 5, tableTop);
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("QTE", colX[0] + 5, tableTop);
     doc
       .fontSize(10)
       .font("Helvetica-Bold")
       .text("DESIGNATION", colX[1] + 5, tableTop);
-    doc.fontSize(10).font("Helvetica-Bold").text("P.U HT", colX[2] + 5, tableTop);
-    doc.fontSize(10).font("Helvetica-Bold").text("P.T HT", colX[3] + 5, tableTop);
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("P.U HT", colX[2] + 5, tableTop);
+    doc
+      .fontSize(10)
+      .font("Helvetica-Bold")
+      .text("P.T HT", colX[3] + 5, tableTop);
 
     // Draw vertical lines for columns
-    doc.moveTo(colX[1], tableTop - 10).lineTo(colX[1], tableTop + tableHeight - 10).stroke();
-    doc.moveTo(colX[2], tableTop - 10).lineTo(colX[2], tableTop + tableHeight - 10).stroke();
-    doc.moveTo(colX[3], tableTop - 10).lineTo(colX[3], tableTop + tableHeight - 10).stroke();
+    doc
+      .moveTo(colX[1], tableTop - 10)
+      .lineTo(colX[1], tableTop + tableHeight - 10)
+      .stroke();
+    doc
+      .moveTo(colX[2], tableTop - 10)
+      .lineTo(colX[2], tableTop + tableHeight - 10)
+      .stroke();
+    doc
+      .moveTo(colX[3], tableTop - 10)
+      .lineTo(colX[3], tableTop + tableHeight - 10)
+      .stroke();
 
     // Draw table header line
     doc
@@ -400,9 +440,15 @@ const generateBillPDF = async (req, res) => {
       const quantity = item.quantity || 1;
       const unitPrice = parseFloat(item.unit_price || item.price);
       const totalPrice = parseFloat(item.price);
-      
-      doc.fontSize(10).font("Helvetica").text(quantity.toString(), colX[0] + 5, currentY);
-      doc.fontSize(10).font("Helvetica").text(item.name, colX[1] + 5, currentY);
+
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .text(quantity.toString(), colX[0] + 5, currentY);
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .text(item.name, colX[1] + 5, currentY);
       doc
         .fontSize(10)
         .font("Helvetica")
@@ -425,33 +471,73 @@ const generateBillPDF = async (req, res) => {
     const totalsTableLeft = 350;
     const totalsTableRight = 520;
     const totalsTableHeight = 80;
-    
+
     // Draw totals table border
-    doc.rect(totalsTableLeft, totalsTableTop, totalsTableRight - totalsTableLeft, totalsTableHeight).stroke();
-    
+    doc
+      .rect(
+        totalsTableLeft,
+        totalsTableTop,
+        totalsTableRight - totalsTableLeft,
+        totalsTableHeight
+      )
+      .stroke();
+
     // Draw vertical line for totals table
-    doc.moveTo(totalsTableLeft + 120, totalsTableTop).lineTo(totalsTableLeft + 120, totalsTableTop + totalsTableHeight).stroke();
-    
+    doc
+      .moveTo(totalsTableLeft + 120, totalsTableTop)
+      .lineTo(totalsTableLeft + 120, totalsTableTop + totalsTableHeight)
+      .stroke();
+
     const tva = parseFloat(bill.total) * 0.19;
     const totalTTC = parseFloat(bill.total) + tva;
-    
+
     // PRIX TOTAL HT
-    doc.fontSize(12).font("Helvetica-Bold").text("PRIX TOTAL HT:", totalsTableLeft + 10, totalsTableTop + 15);
-    doc.fontSize(12).font("Helvetica").text(`${parseFloat(bill.total).toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 15);
-    
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("PRIX TOTAL HT:", totalsTableLeft + 10, totalsTableTop + 15);
+    doc
+      .fontSize(12)
+      .font("Helvetica")
+      .text(
+        `${parseFloat(bill.total).toFixed(2)}`,
+        totalsTableLeft + 130,
+        totalsTableTop + 15
+      );
+
     // TVA 19%
-    doc.fontSize(12).font("Helvetica-Bold").text("TVA 19%:", totalsTableLeft + 10, totalsTableTop + 35);
-    doc.fontSize(12).font("Helvetica").text(`${tva.toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 35);
-    
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("TVA 19%:", totalsTableLeft + 10, totalsTableTop + 35);
+    doc
+      .fontSize(12)
+      .font("Helvetica")
+      .text(`${tva.toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 35);
+
     // TOTAL TTC
-    doc.fontSize(12).font("Helvetica-Bold").text("TOTAL TTC:", totalsTableLeft + 10, totalsTableTop + 55);
-    doc.fontSize(12).font("Helvetica").text(`${totalTTC.toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 55);
+    doc
+      .fontSize(12)
+      .font("Helvetica-Bold")
+      .text("TOTAL TTC:", totalsTableLeft + 10, totalsTableTop + 55);
+    doc
+      .fontSize(12)
+      .font("Helvetica")
+      .text(
+        `${totalTTC.toFixed(2)}`,
+        totalsTableLeft + 130,
+        totalsTableTop + 55
+      );
 
     // Approval Statement
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text("ARRETÉE LA PRÉSENTE FACTURE A LA SOMME DE :", 50, totalsTableTop + 100);
+      .text(
+        "ARRETÉE LA PRÉSENTE FACTURE A LA SOMME DE :",
+        50,
+        totalsTableTop + 100
+      );
     doc
       .fontSize(10)
       .font("Helvetica")
@@ -467,8 +553,6 @@ const generateBillPDF = async (req, res) => {
       .font("Helvetica-Oblique")
       .fillColor("red")
       .text("MERCI POUR VOTRE CONFIANCE !", 200, totalsTableTop + 150);
-
-
 
     console.log("PDF generation completed for bill:", bill.id);
 
