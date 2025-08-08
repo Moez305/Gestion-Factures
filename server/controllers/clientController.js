@@ -44,9 +44,31 @@ const getClients = async (req, res) => {
     const clients = await Client.findAll({
       where: whereClause,
       order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: require("../models/Bill"),
+          as: "Bills",
+          attributes: ["total", "paid"],
+        },
+      ],
     });
 
-    res.json(clients);
+    // Calculate total billed and payment status for each client
+    const clientsWithStats = clients.map(client => {
+      const totalBilled = client.Bills.reduce((sum, bill) => sum + parseFloat(bill.total), 0);
+      const totalPaid = client.Bills.filter(bill => bill.paid).reduce((sum, bill) => sum + parseFloat(bill.total), 0);
+      const hasUnpaidBills = client.Bills.some(bill => !bill.paid);
+      
+      return {
+        ...client.toJSON(),
+        total_billed: totalBilled,
+        total_paid: totalPaid,
+        has_unpaid_bills: hasUnpaidBills,
+        payment_status: hasUnpaidBills ? 'Unpaid' : 'Paid'
+      };
+    });
+
+    res.json(clientsWithStats);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

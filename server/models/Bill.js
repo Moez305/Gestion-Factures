@@ -25,6 +25,11 @@ const Bill = sequelize.define('Bill', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
     defaultValue: 0
+  },
+  paid: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
   tableName: 'bills',

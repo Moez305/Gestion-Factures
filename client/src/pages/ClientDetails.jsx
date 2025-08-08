@@ -207,10 +207,11 @@ const ClientDetails = () => {
               <thead>
                 <tr>
                   <th><i className="fas fa-hashtag"></i> Bill #</th>
-                  <th><i className="fas fa-calendar"></i> Date</th>
-                  <th><i className="fas fa-list"></i> Items</th>
-                  <th><i className="fas fa-money-bill"></i> Total</th>
-                  <th><i className="fas fa-cogs"></i> Actions</th>
+                                     <th><i className="fas fa-calendar"></i> Date</th>
+                   <th><i className="fas fa-list"></i> Items</th>
+                   <th><i className="fas fa-money-bill"></i> Total</th>
+                   <th><i className="fas fa-credit-card"></i> Status</th>
+                   <th><i className="fas fa-cogs"></i> Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -240,12 +241,24 @@ const ClientDetails = () => {
                         {bill.BillItems ? bill.BillItems.length : 0} items
                       </div>
                     </td>
-                    <td>
-                      <div style={{ fontWeight: '600', color: '#2d3748' }}>
-                        {parseFloat(bill.total).toFixed(2)} TND
-                      </div>
-                    </td>
-                    <td>
+                                         <td>
+                       <div style={{ fontWeight: '600', color: '#2d3748' }}>
+                         {parseFloat(bill.total).toFixed(2)} TND
+                       </div>
+                     </td>
+                     <td>
+                       <span style={{
+                         background: bill.paid ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #f56565, #e53e3e)',
+                         color: 'white',
+                         padding: '4px 12px',
+                         borderRadius: '20px',
+                         fontSize: '0.85rem',
+                         fontWeight: '500'
+                       }}>
+                         {bill.paid ? 'Paid' : 'Unpaid'}
+                       </span>
+                     </td>
+                     <td>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                           className="btn btn-primary"

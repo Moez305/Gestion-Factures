@@ -138,11 +138,12 @@ const Home = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th><i className="fas fa-user"></i> Client Name</th>
-                  <th><i className="fas fa-phone"></i> Phone</th>
-                  <th><i className="fas fa-hashtag"></i> Code</th>
-                  <th><i className="fas fa-money-bill"></i> Total Billed</th>
-                  <th><i className="fas fa-cogs"></i> Actions</th>
+                                     <th><i className="fas fa-user"></i> Client Name</th>
+                   <th><i className="fas fa-phone"></i> Phone</th>
+                   <th><i className="fas fa-hashtag"></i> Code</th>
+                   <th><i className="fas fa-money-bill"></i> Total Billed</th>
+                   <th><i className="fas fa-credit-card"></i> Status</th>
+                   <th><i className="fas fa-cogs"></i> Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -187,12 +188,24 @@ const Home = () => {
                         {client.code}
                       </span>
                     </td>
-                    <td>
-                      <div style={{ fontWeight: '600', color: '#2d3748' }}>
-                        {parseFloat(client.total_billed || 0).toFixed(2)} TND
-                      </div>
-                    </td>
-                    <td>
+                                         <td>
+                       <div style={{ fontWeight: '600', color: '#2d3748' }}>
+                         {parseFloat(client.total_billed || 0).toFixed(2)} TND
+                       </div>
+                     </td>
+                     <td>
+                       <span style={{
+                         background: client.payment_status === 'Paid' ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #f56565, #e53e3e)',
+                         color: 'white',
+                         padding: '4px 12px',
+                         borderRadius: '20px',
+                         fontSize: '0.85rem',
+                         fontWeight: '500'
+                       }}>
+                         {client.payment_status || 'No Bills'}
+                       </span>
+                     </td>
+                     <td>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <Link
                           to={`/client/${client.id}`}

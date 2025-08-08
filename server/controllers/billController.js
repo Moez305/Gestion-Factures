@@ -115,6 +115,7 @@ const createBill = async (req, res) => {
       client_id: clientId,
       date: date || new Date(),
       total,
+      paid: false, // Default to unpaid
     });
 
     // Create bill items
