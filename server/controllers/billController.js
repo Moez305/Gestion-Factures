@@ -288,9 +288,9 @@ const generateBillPDF = async (req, res) => {
     // Try to load logo image if it exists
     try {
       const logoPath = "./assets/logo.png";
-      if (require("fs").existsSync(logoPath)) {
-        doc.image(logoPath, logoX, logoY, { width: 150, height: 70 }); // Bigger logo
-      } else {
+             if (require("fs").existsSync(logoPath)) {
+         doc.image(logoPath, logoX, logoY, { width: 200, height: 100 }); // Even bigger logo
+       } else {
         // Fallback: Draw gear icon (simplified version)
         const gearRadius = 25; // Bigger gear icon
 
@@ -320,12 +320,12 @@ const generateBillPDF = async (req, res) => {
 
     // Add horizontal line in header
     doc
-      .moveTo(logoX + 150, logoY + 10)
-      .lineTo(500, logoY + 10)
+      .moveTo(logoX + 220, logoY + 50) // Adjusted for bigger logo
+      .lineTo(500, logoY + 50)
       .stroke();
 
     // Invoice Details Section (Left side)
-    const detailsY = 120;
+    const detailsY = 150; // Moved down to avoid overlap with bigger logo
     doc.fontSize(12).font("Helvetica-Bold").text("FACTURE N°:", 50, detailsY);
     doc.fontSize(12).font("Helvetica").text(bill.id.toString(), 150, detailsY);
 
