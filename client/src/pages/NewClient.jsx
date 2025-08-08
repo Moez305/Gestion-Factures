@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BillForm from "../components/BillForm";
+import ClientForm from "../components/ClientForm";
 import api from "../config/api";
 
-const NewBill = () => {
+const NewClient = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (billData) => {
+  const handleSubmit = async (clientData) => {
     try {
       setLoading(true);
-      await api.post("/api/bills", billData);
-      alert("Bill created successfully!");
+      await api.post("/api/clients", clientData);
+      alert("Client created successfully!");
       navigate("/");
     } catch (error) {
-      console.error("Error creating bill:", error);
-      alert("Error creating bill. Please try again.");
+      console.error("Error creating client:", error);
+      alert("Error creating client. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -25,13 +25,13 @@ const NewBill = () => {
     <div className="container">
       {/* Modern Header */}
       <div className="header fade-in-up">
-        <h1><i className="fas fa-file-invoice"></i> Create New Bill</h1>
-        <p>Generate a professional invoice for your client</p>
+        <h1><i className="fas fa-user-plus"></i> Add New Client</h1>
+        <p>Register a new client in your billing system</p>
       </div>
 
-      {/* Bill Form */}
+      {/* Client Form */}
       <div className="card fade-in-up">
-        <BillForm onSubmit={handleSubmit} loading={loading} />
+        <ClientForm onSubmit={handleSubmit} loading={loading} />
       </div>
 
       {/* Back Button */}
@@ -48,4 +48,4 @@ const NewBill = () => {
   );
 };
 
-export default NewBill;
+export default NewClient;

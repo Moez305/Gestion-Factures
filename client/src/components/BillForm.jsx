@@ -89,64 +89,58 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="fade-in-up">
       {/* Client Information */}
-      <div
-        style={{
-          border: "1px solid #ddd",
-          padding: "20px",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
-        <h3 style={{ marginTop: "0", marginBottom: "15px", color: "#333" }}>
-          👤 Client Information
+      <div className="card">
+        <h3 style={{ marginTop: "0", marginBottom: "20px", color: "#2d3748", display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <i className="fas fa-user" style={{ color: '#667eea' }}></i>
+          Client Information
         </h3>
 
-        <div className="form-group">
-          <label htmlFor="client_name">Client Name:</label>
-          <input
-            type="text"
-            id="client_name"
-            name="client_name"
-            value={formData.client_name}
-            onChange={handleChange}
-            placeholder="Enter client name"
-            required
-          />
-        </div>
+        <div className="grid grid-2">
+          <div className="form-group">
+            <label htmlFor="client_name">
+              <i className="fas fa-user-circle"></i> Client Name
+            </label>
+            <input
+              type="text"
+              id="client_name"
+              name="client_name"
+              value={formData.client_name}
+              onChange={handleChange}
+              placeholder="Enter client name"
+              required
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="client_phone">Phone Number:</label>
-          <input
-            type="tel"
-            id="client_phone"
-            name="client_phone"
-            value={formData.client_phone}
-            onChange={handleChange}
-            placeholder="Enter phone number"
-            required
-          />
+          <div className="form-group">
+            <label htmlFor="client_phone">
+              <i className="fas fa-phone"></i> Phone Number
+            </label>
+            <input
+              type="tel"
+              id="client_phone"
+              name="client_phone"
+              value={formData.client_phone}
+              onChange={handleChange}
+              placeholder="Enter phone number"
+              required
+            />
+          </div>
         </div>
       </div>
 
       {/* Bill Information */}
-      <div
-        style={{
-          border: "1px solid #ddd",
-          padding: "20px",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
-        <h3 style={{ marginTop: "0", marginBottom: "15px", color: "#333" }}>
-          📄 Bill Information
+      <div className="card">
+        <h3 style={{ marginTop: "0", marginBottom: "20px", color: "#2d3748", display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <i className="fas fa-file-invoice" style={{ color: '#667eea' }}></i>
+          Bill Information
         </h3>
 
         <div className="form-group">
-          <label htmlFor="date">Date:</label>
+          <label htmlFor="date">
+            <i className="fas fa-calendar"></i> Date
+          </label>
           <input
             type="date"
             id="date"
@@ -158,17 +152,12 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
         </div>
 
         <div className="form-group">
-          <label>Items:</label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <i className="fas fa-list"></i> Items
+          </label>
+          
           {formData.items.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginBottom: "10px",
-                alignItems: "center",
-              }}
-            >
+            <div key={index} className="item-row">
               <input
                 type="number"
                 placeholder="QTE"
@@ -176,7 +165,7 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
                 onChange={(e) =>
                   handleItemChange(index, "quantity", e.target.value)
                 }
-                style={{ flex: 0.5 }}
+                className="qte-input"
                 min="1"
                 required
               />
@@ -187,78 +176,48 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
                 onChange={(e) =>
                   handleItemChange(index, "name", e.target.value)
                 }
-                style={{ flex: 2 }}
+                className="name-input"
                 required
               />
-                             <input
-                 type="number"
-                 placeholder="P.U HT"
-                 value={item.unit_price}
-                 onChange={(e) =>
-                   handleItemChange(index, "unit_price", e.target.value)
-                 }
-                 style={{ flex: 1 }}
-                 step="0.01"
-                 min="0"
-                 required
-               />
-               <div
-                 style={{
-                   flex: 1,
-                   backgroundColor: "#f8f9fa",
-                   padding: "8px 12px",
-                   border: "1px solid #ddd",
-                   borderRadius: "4px",
-                   textAlign: "center",
-                   color: "#666"
-                 }}
-               >
-                 P.T HT: {((parseFloat(item.quantity) || 1) * (parseFloat(item.unit_price) || 0)).toFixed(2)} TND
-               </div>
+              <input
+                type="number"
+                placeholder="P.U HT"
+                value={item.unit_price}
+                onChange={(e) =>
+                  handleItemChange(index, "unit_price", e.target.value)
+                }
+                className="price-input"
+                step="0.01"
+                min="0"
+                required
+              />
+              <div className="total-display">
+                P.T HT: {((parseFloat(item.quantity) || 1) * (parseFloat(item.unit_price) || 0)).toFixed(2)} TND
+              </div>
               {formData.items.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
-                  style={{
-                    background: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    padding: "8px 12px",
-                    cursor: "pointer",
-                  }}
+                  className="btn btn-danger"
+                  style={{ padding: '8px 12px', minWidth: 'auto' }}
                 >
-                  ✕
+                  <i className="fas fa-trash"></i>
                 </button>
               )}
             </div>
           ))}
+          
           <button
             type="button"
             onClick={addItem}
-            style={{
-              background: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              padding: "8px 16px",
-              cursor: "pointer",
-              marginTop: "10px",
-            }}
+            className="btn btn-success"
+            style={{ marginTop: "15px" }}
           >
-            + Add Item
+            <i className="fas fa-plus"></i> Add Item
           </button>
         </div>
 
-        <div
-          style={{
-            background: "#e9ecef",
-            padding: "15px",
-            borderRadius: "4px",
-            marginTop: "15px",
-            textAlign: "right",
-          }}
-        >
+        <div className="total-section">
           <strong>Total: {calculateTotal().toFixed(2)} TND</strong>
         </div>
       </div>
@@ -267,9 +226,18 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
         type="submit"
         className="btn btn-primary"
         disabled={loading}
-        style={{ width: "100%", padding: "12px" }}
+        style={{ width: "100%", padding: "16px", fontSize: "1.1rem", marginTop: "20px" }}
       >
-        {loading ? "Creating Bill..." : "Create Bill"}
+        {loading ? (
+          <>
+            <div className="spinner" style={{ width: '20px', height: '20px', marginRight: '10px' }}></div>
+            Creating Bill...
+          </>
+        ) : (
+          <>
+            <i className="fas fa-save"></i> Create Bill
+          </>
+        )}
       </button>
     </form>
   );
