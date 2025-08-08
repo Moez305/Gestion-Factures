@@ -8,7 +8,6 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
       ? new Date(initialData.date).toISOString().split("T")[0]
       : new Date().toISOString().split("T")[0],
     items: initialData?.items || [{ name: "", quantity: "1", unit_price: "", price: "" }],
-    paid: initialData?.paid || false,
   });
 
   const handleChange = (e) => {
@@ -84,7 +83,6 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
         quantity: parseInt(item.quantity) || 1,
         unit_price: parseFloat(item.unit_price),
       })),
-      paid: formData.paid,
     };
 
     onSubmit(billData);
@@ -153,38 +151,7 @@ const BillForm = ({ onSubmit, initialData = null, loading = false }) => {
            />
          </div>
 
-                 <div className="grid grid-2">
-           <div className="form-group">
-             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-               <i className="fas fa-credit-card"></i> Payment Status
-             </label>
-             <div style={{ 
-               display: 'flex', 
-               alignItems: 'center', 
-               gap: '10px',
-               padding: '12px',
-               background: 'rgba(255, 255, 255, 0.7)',
-               borderRadius: '8px',
-               border: '1px solid rgba(255, 255, 255, 0.3)'
-             }}>
-               <input
-                 type="checkbox"
-                 id="paid"
-                 name="paid"
-                 checked={formData.paid}
-                 onChange={(e) => setFormData({ ...formData, paid: e.target.checked })}
-                 style={{ 
-                   width: '18px', 
-                   height: '18px',
-                   accentColor: '#667eea'
-                 }}
-               />
-               <label htmlFor="paid" style={{ margin: 0, cursor: 'pointer', fontWeight: '500' }}>
-                 {formData.paid ? 'Paid' : 'Unpaid'}
-               </label>
-             </div>
-           </div>
-         </div>
+        
 
          <div className="form-group">
            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

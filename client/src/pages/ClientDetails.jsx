@@ -247,16 +247,36 @@ const ClientDetails = () => {
                        </div>
                      </td>
                      <td>
-                       <span style={{
-                         background: bill.paid ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #f56565, #e53e3e)',
-                         color: 'white',
-                         padding: '4px 12px',
-                         borderRadius: '20px',
-                         fontSize: '0.85rem',
-                         fontWeight: '500'
-                       }}>
-                         {bill.paid ? 'Paid' : 'Unpaid'}
-                       </span>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                         <input
+                           type="checkbox"
+                           checked={bill.paid}
+                           onChange={async (e) => {
+                             try {
+                               await api.put(`/api/bills/${bill.id}`, { paid: e.target.checked });
+                               fetchClientData(); // Refresh data
+                             } catch (error) {
+                               console.error("Error updating payment status:", error);
+                               alert("Error updating payment status. Please try again.");
+                             }
+                           }}
+                           style={{ 
+                             width: '18px', 
+                             height: '18px',
+                             accentColor: '#667eea'
+                           }}
+                         />
+                         <span style={{
+                           background: bill.paid ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #f56565, #e53e3e)',
+                           color: 'white',
+                           padding: '4px 12px',
+                           borderRadius: '20px',
+                           fontSize: '0.85rem',
+                           fontWeight: '500'
+                         }}>
+                           {bill.paid ? 'Paid' : 'Unpaid'}
+                         </span>
+                       </div>
                      </td>
                      <td>
                       <div style={{ display: 'flex', gap: '8px' }}>

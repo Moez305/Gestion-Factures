@@ -158,11 +158,17 @@ const createBill = async (req, res) => {
 // Update bill
 const updateBill = async (req, res) => {
   try {
-    const { date, items } = req.body;
+    const { date, items, paid } = req.body;
     const bill = await Bill.findByPk(req.params.id);
 
     if (!bill) {
       return res.status(404).json({ message: "Bill not found" });
+    }
+
+    // If only updating payment status
+    if (paid !== undefined && Object.keys(req.body).length === 1) {
+      await bill.update({ paid });
+      return res.json(bill);
     }
 
     // Calculate new total
@@ -176,6 +182,7 @@ const updateBill = async (req, res) => {
     await bill.update({
       date: date || bill.date,
       total,
+      paid: paid !== undefined ? paid : bill.paid,
     });
 
     // Delete existing items and create new ones

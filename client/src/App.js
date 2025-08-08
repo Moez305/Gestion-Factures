@@ -1,10 +1,10 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
-import ClientDetails from './pages/ClientDetails';
-import NewBill from './pages/NewBill';
-import NewClient from './pages/NewClient';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Home from "./pages/Home";
+import ClientDetails from "./pages/ClientDetails";
+import NewBill from "./pages/NewBill";
+import NewClient from "./pages/NewClient";
+import "./App.css";
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
             <Link to="/new-bill">📄 New Bill</Link>
           </div>
         </nav>
-        
+
         <div className="container">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -31,4 +31,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
