@@ -262,28 +262,39 @@ const generateBillPDF = async (req, res) => {
     doc.pipe(res);
 
     // Header Section with Logo
-    // Draw gear icon (simplified version)
     const logoX = 50;
     const logoY = 50;
-    const gearRadius = 15;
     
-    // Draw gear outline
-    doc.circle(logoX + gearRadius, logoY + gearRadius, gearRadius).stroke();
-    
-    // Draw gear teeth (simplified)
-    for (let i = 0; i < 8; i++) {
-      const angle = (i * Math.PI) / 4;
-      const x1 = logoX + gearRadius + Math.cos(angle) * gearRadius;
-      const y1 = logoY + gearRadius + Math.sin(angle) * gearRadius;
-      const x2 = logoX + gearRadius + Math.cos(angle) * (gearRadius + 5);
-      const y2 = logoY + gearRadius + Math.sin(angle) * (gearRadius + 5);
-      doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
+    // Try to load logo image if it exists
+    try {
+      const logoPath = './server/assets/logo.png';
+      if (require('fs').existsSync(logoPath)) {
+        doc.image(logoPath, logoX, logoY, { width: 30, height: 30 });
+      } else {
+        // Fallback: Draw gear icon (simplified version)
+        const gearRadius = 15;
+        
+        // Draw gear outline
+        doc.circle(logoX + gearRadius, logoY + gearRadius, gearRadius).stroke();
+        
+        // Draw gear teeth (simplified)
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * Math.PI) / 4;
+          const x1 = logoX + gearRadius + Math.cos(angle) * gearRadius;
+          const y1 = logoY + gearRadius + Math.sin(angle) * gearRadius;
+          const x2 = logoX + gearRadius + Math.cos(angle) * (gearRadius + 5);
+          const y2 = logoY + gearRadius + Math.sin(angle) * (gearRadius + 5);
+          doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
+        }
+        
+        // Draw red drop in center
+        doc.fillColor("red");
+        doc.circle(logoX + gearRadius, logoY + gearRadius, 5).fill();
+        doc.fillColor("black");
+      }
+    } catch (error) {
+      console.log("Logo not found, using fallback");
     }
-    
-    // Draw red drop in center
-    doc.fillColor("red");
-    doc.circle(logoX + gearRadius, logoY + gearRadius, 5).fill();
-    doc.fillColor("black");
     
     // Company name and slogan
     doc.fontSize(24).font("Helvetica-Bold").text("ORM", logoX + 40, logoY);
@@ -338,9 +349,14 @@ const generateBillPDF = async (req, res) => {
     doc.font("Helvetica-Bold").text("CODE CLIENT:", clientBoxX + 10, clientBoxY + 75);
     doc.font("Helvetica").text(bill.Client.code, clientBoxX + 90, clientBoxY + 75);
 
-    // Items Table
+    // Items Table with proper borders
     const tableTop = detailsY + 120;
+    const tableLeft = 50;
+    const tableRight = 520;
     const colX = [50, 110, 360, 440];
+
+    // Draw table border
+    doc.rect(tableLeft, tableTop - 10, tableRight - tableLeft, 200).stroke();
 
     // Table headers
     doc.fontSize(10).font("Helvetica-Bold").text("QTE", colX[0], tableTop);
@@ -351,10 +367,15 @@ const generateBillPDF = async (req, res) => {
     doc.fontSize(10).font("Helvetica-Bold").text("P.U HT", colX[2], tableTop);
     doc.fontSize(10).font("Helvetica-Bold").text("P.T HT", colX[3], tableTop);
 
+    // Draw vertical lines for columns
+    doc.moveTo(colX[1], tableTop - 10).lineTo(colX[1], tableTop + 190).stroke();
+    doc.moveTo(colX[2], tableTop - 10).lineTo(colX[2], tableTop + 190).stroke();
+    doc.moveTo(colX[3], tableTop - 10).lineTo(colX[3], tableTop + 190).stroke();
+
     // Draw table header line
     doc
-      .moveTo(50, tableTop + 15)
-      .lineTo(520, tableTop + 15)
+      .moveTo(tableLeft, tableTop + 15)
+      .lineTo(tableRight, tableTop + 15)
       .stroke();
 
     // Table content
@@ -375,8 +396,8 @@ const generateBillPDF = async (req, res) => {
 
     // Draw table bottom line
     doc
-      .moveTo(50, currentY + 5)
-      .lineTo(520, currentY + 5)
+      .moveTo(tableLeft, currentY + 5)
+      .lineTo(tableRight, currentY + 5)
       .stroke();
 
     // Totals Section (Right side)
@@ -431,20 +452,7 @@ const generateBillPDF = async (req, res) => {
       .fillColor("red")
       .text("MERCI POUR VOTRE CONFIANCE !", 200, totalsY + 130);
 
-    // Company contact information
-    doc
-      .fontSize(8)
-      .font("Helvetica")
-      .fillColor("black")
-      .text("BIAT belvue:", 50, totalsY + 150);
-    doc
-      .fontSize(8)
-      .font("Helvetica")
-      .text("R.C: ...... Tunis-T.V.A: 608 154 SAC000.RUE SALAH EDDIN", 50, totalsY + 165);
-    doc
-      .fontSize(8)
-      .font("Helvetica")
-      .text("TEI :", 50, totalsY + 180);
+
 
     console.log("PDF generation completed for bill:", bill.id);
 
