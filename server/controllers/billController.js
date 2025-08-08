@@ -289,10 +289,10 @@ const generateBillPDF = async (req, res) => {
     try {
       const logoPath = './assets/logo.png';
       if (require('fs').existsSync(logoPath)) {
-        doc.image(logoPath, logoX, logoY, { width: 30, height: 30 });
+        doc.image(logoPath, logoX, logoY, { width: 50, height: 50 }); // Bigger logo
       } else {
         // Fallback: Draw gear icon (simplified version)
-        const gearRadius = 15;
+        const gearRadius = 25; // Bigger gear icon
         
         // Draw gear outline
         doc.circle(logoX + gearRadius, logoY + gearRadius, gearRadius).stroke();
@@ -316,11 +316,7 @@ const generateBillPDF = async (req, res) => {
       console.log("Logo not found, using fallback");
     }
     
-    // Company slogan only (no ORM text, just logo)
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text("réparation et maintenance", logoX + 40, logoY + 10);
+    // No company text, just logo
 
     // Add horizontal line in header
     doc.moveTo(logoX + 150, logoY + 10).lineTo(500, logoY + 10).stroke();
@@ -424,57 +420,53 @@ const generateBillPDF = async (req, res) => {
       .lineTo(tableRight, tableTop + tableHeight - 10)
       .stroke();
 
-    // Totals Section (Right side) - positioned within table
-    const totalsY = tableTop + tableHeight - 60;
-    doc
-      .fontSize(12)
-      .font("Helvetica-Bold")
-      .text("PRIX TOTAL HT:", 350, totalsY);
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text(`${parseFloat(bill.total).toFixed(2)}`, 480, totalsY);
-
+    // Totals Section - Separate small table under main table
+    const totalsTableTop = tableTop + tableHeight + 20;
+    const totalsTableLeft = 350;
+    const totalsTableRight = 520;
+    const totalsTableHeight = 80;
+    
+    // Draw totals table border
+    doc.rect(totalsTableLeft, totalsTableTop, totalsTableRight - totalsTableLeft, totalsTableHeight).stroke();
+    
+    // Draw vertical line for totals table
+    doc.moveTo(totalsTableLeft + 120, totalsTableTop).lineTo(totalsTableLeft + 120, totalsTableTop + totalsTableHeight).stroke();
+    
     const tva = parseFloat(bill.total) * 0.19;
-    doc
-      .fontSize(12)
-      .font("Helvetica-Bold")
-      .text("TVA 19%:", 350, totalsY + 20);
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text(`${tva.toFixed(2)}`, 480, totalsY + 20);
-
     const totalTTC = parseFloat(bill.total) + tva;
-    doc
-      .fontSize(12)
-      .font("Helvetica-Bold")
-      .text("TOTAL TTC:", 350, totalsY + 40);
-    doc
-      .fontSize(12)
-      .font("Helvetica")
-      .text(`${totalTTC.toFixed(2)}`, 480, totalsY + 40);
+    
+    // PRIX TOTAL HT
+    doc.fontSize(12).font("Helvetica-Bold").text("PRIX TOTAL HT:", totalsTableLeft + 10, totalsTableTop + 15);
+    doc.fontSize(12).font("Helvetica").text(`${parseFloat(bill.total).toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 15);
+    
+    // TVA 19%
+    doc.fontSize(12).font("Helvetica-Bold").text("TVA 19%:", totalsTableLeft + 10, totalsTableTop + 35);
+    doc.fontSize(12).font("Helvetica").text(`${tva.toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 35);
+    
+    // TOTAL TTC
+    doc.fontSize(12).font("Helvetica-Bold").text("TOTAL TTC:", totalsTableLeft + 10, totalsTableTop + 55);
+    doc.fontSize(12).font("Helvetica").text(`${totalTTC.toFixed(2)}`, totalsTableLeft + 130, totalsTableTop + 55);
 
     // Approval Statement
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text("ARRETÉE LA PRÉSENTE FACTURE A LA SOMME DE :", 50, totalsY + 80);
+      .text("ARRETÉE LA PRÉSENTE FACTURE A LA SOMME DE :", 50, totalsTableTop + 100);
     doc
       .fontSize(10)
       .font("Helvetica")
-      .text(`${totalTTC.toFixed(2)} TND`, 50, totalsY + 95);
+      .text(`${totalTTC.toFixed(2)} TND`, 50, totalsTableTop + 115);
 
     // Footer
     doc
-      .moveTo(50, totalsY + 120)
-      .lineTo(520, totalsY + 120)
+      .moveTo(50, totalsTableTop + 140)
+      .lineTo(520, totalsTableTop + 140)
       .stroke();
     doc
       .fontSize(10)
       .font("Helvetica-Oblique")
       .fillColor("red")
-      .text("MERCI POUR VOTRE CONFIANCE !", 200, totalsY + 130);
+      .text("MERCI POUR VOTRE CONFIANCE !", 200, totalsTableTop + 150);
 
 
 
