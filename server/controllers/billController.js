@@ -267,7 +267,7 @@ const generateBillPDF = async (req, res) => {
     
     // Try to load logo image if it exists
     try {
-      const logoPath = './server/assets/logo.png';
+      const logoPath = './assets/logo.png';
       if (require('fs').existsSync(logoPath)) {
         doc.image(logoPath, logoX, logoY, { width: 30, height: 30 });
       } else {
@@ -349,28 +349,29 @@ const generateBillPDF = async (req, res) => {
     doc.font("Helvetica-Bold").text("CODE CLIENT:", clientBoxX + 10, clientBoxY + 75);
     doc.font("Helvetica").text(bill.Client.code, clientBoxX + 90, clientBoxY + 75);
 
-    // Items Table with proper borders
+    // Items Table with proper borders - exactly like template
     const tableTop = detailsY + 120;
     const tableLeft = 50;
     const tableRight = 520;
+    const tableHeight = 200;
     const colX = [50, 110, 360, 440];
 
-    // Draw table border
-    doc.rect(tableLeft, tableTop - 10, tableRight - tableLeft, 200).stroke();
+    // Draw main table border
+    doc.rect(tableLeft, tableTop - 10, tableRight - tableLeft, tableHeight).stroke();
 
     // Table headers
-    doc.fontSize(10).font("Helvetica-Bold").text("QTE", colX[0], tableTop);
+    doc.fontSize(10).font("Helvetica-Bold").text("QTE", colX[0] + 5, tableTop);
     doc
       .fontSize(10)
       .font("Helvetica-Bold")
-      .text("DESIGNATION", colX[1], tableTop);
-    doc.fontSize(10).font("Helvetica-Bold").text("P.U HT", colX[2], tableTop);
-    doc.fontSize(10).font("Helvetica-Bold").text("P.T HT", colX[3], tableTop);
+      .text("DESIGNATION", colX[1] + 5, tableTop);
+    doc.fontSize(10).font("Helvetica-Bold").text("P.U HT", colX[2] + 5, tableTop);
+    doc.fontSize(10).font("Helvetica-Bold").text("P.T HT", colX[3] + 5, tableTop);
 
     // Draw vertical lines for columns
-    doc.moveTo(colX[1], tableTop - 10).lineTo(colX[1], tableTop + 190).stroke();
-    doc.moveTo(colX[2], tableTop - 10).lineTo(colX[2], tableTop + 190).stroke();
-    doc.moveTo(colX[3], tableTop - 10).lineTo(colX[3], tableTop + 190).stroke();
+    doc.moveTo(colX[1], tableTop - 10).lineTo(colX[1], tableTop + tableHeight - 10).stroke();
+    doc.moveTo(colX[2], tableTop - 10).lineTo(colX[2], tableTop + tableHeight - 10).stroke();
+    doc.moveTo(colX[3], tableTop - 10).lineTo(colX[3], tableTop + tableHeight - 10).stroke();
 
     // Draw table header line
     doc
@@ -378,30 +379,30 @@ const generateBillPDF = async (req, res) => {
       .lineTo(tableRight, tableTop + 15)
       .stroke();
 
-    // Table content
+    // Table content with proper spacing
     let currentY = tableTop + 25;
     bill.BillItems.forEach((item, index) => {
-      doc.fontSize(10).font("Helvetica").text("1", colX[0], currentY);
-      doc.fontSize(10).font("Helvetica").text(item.name, colX[1], currentY);
+      doc.fontSize(10).font("Helvetica").text("1", colX[0] + 5, currentY);
+      doc.fontSize(10).font("Helvetica").text(item.name, colX[1] + 5, currentY);
       doc
         .fontSize(10)
         .font("Helvetica")
-        .text(`${parseFloat(item.price).toFixed(2)}`, colX[2], currentY);
+        .text(`${parseFloat(item.price).toFixed(2)}`, colX[2] + 5, currentY);
       doc
         .fontSize(10)
         .font("Helvetica")
-        .text(`${parseFloat(item.price).toFixed(2)}`, colX[3], currentY);
+        .text(`${parseFloat(item.price).toFixed(2)}`, colX[3] + 5, currentY);
       currentY += 20;
     });
 
     // Draw table bottom line
     doc
-      .moveTo(tableLeft, currentY + 5)
-      .lineTo(tableRight, currentY + 5)
+      .moveTo(tableLeft, tableTop + tableHeight - 10)
+      .lineTo(tableRight, tableTop + tableHeight - 10)
       .stroke();
 
-    // Totals Section (Right side)
-    const totalsY = currentY + 20;
+    // Totals Section (Right side) - positioned within table
+    const totalsY = tableTop + tableHeight - 60;
     doc
       .fontSize(12)
       .font("Helvetica-Bold")
