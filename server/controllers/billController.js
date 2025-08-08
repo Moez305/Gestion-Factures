@@ -283,7 +283,7 @@ const generateBillPDF = async (req, res) => {
 
     // Header Section with Logo
     const logoX = 50;
-    const logoY = 50;
+    const logoY = 10; // Moved up to align with the horizontal line
 
     // Try to load logo image if it exists
     try {
