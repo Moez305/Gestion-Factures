@@ -261,58 +261,85 @@ const generateBillPDF = async (req, res) => {
     // Pipe PDF to response
     doc.pipe(res);
 
-    // Header Section
-    doc.fontSize(24).font("Helvetica-Bold").text("ORM", 50, 50);
+    // Header Section with Logo
+    // Draw gear icon (simplified version)
+    const logoX = 50;
+    const logoY = 50;
+    const gearRadius = 15;
+    
+    // Draw gear outline
+    doc.circle(logoX + gearRadius, logoY + gearRadius, gearRadius).stroke();
+    
+    // Draw gear teeth (simplified)
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      const x1 = logoX + gearRadius + Math.cos(angle) * gearRadius;
+      const y1 = logoY + gearRadius + Math.sin(angle) * gearRadius;
+      const x2 = logoX + gearRadius + Math.cos(angle) * (gearRadius + 5);
+      const y2 = logoY + gearRadius + Math.sin(angle) * (gearRadius + 5);
+      doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
+    }
+    
+    // Draw red drop in center
+    doc.fillColor("red");
+    doc.circle(logoX + gearRadius, logoY + gearRadius, 5).fill();
+    doc.fillColor("black");
+    
+    // Company name and slogan
+    doc.fontSize(24).font("Helvetica-Bold").text("ORM", logoX + 40, logoY);
     doc
       .fontSize(12)
       .font("Helvetica")
-      .text("réparation et maintenance", 50, 75);
-    //heere imma add the logo
+      .text("réparation et maintenance", logoX + 40, logoY + 25);
 
-    // Add horizontal lines in header
-    doc.moveTo(200, 60).lineTo(500, 60).stroke();
-    doc.moveTo(200, 70).lineTo(500, 70).stroke();
+    // Add horizontal line in header
+    doc.moveTo(logoX + 150, logoY + 10).lineTo(500, logoY + 10).stroke();
 
     // Invoice Details Section (Left side)
-    doc.fontSize(12).font("Helvetica-Bold").text("FACTURE N°:", 50, 120);
-    doc.fontSize(12).font("Helvetica").text(bill.id.toString(), 150, 120);
+    const detailsY = 120;
+    doc.fontSize(12).font("Helvetica-Bold").text("FACTURE N°:", 50, detailsY);
+    doc.fontSize(12).font("Helvetica").text(bill.id.toString(), 150, detailsY);
 
-    doc.fontSize(12).font("Helvetica-Bold").text("DATE:", 50, 140);
+    doc.fontSize(12).font("Helvetica-Bold").text("DATE:", 50, detailsY + 20);
     doc
       .fontSize(12)
       .font("Helvetica")
-      .text(new Date(bill.date).toLocaleDateString("fr-FR"), 150, 140);
+      .text(new Date(bill.date).toLocaleDateString("fr-FR"), 150, detailsY + 20);
 
-    doc.fontSize(12).font("Helvetica-Bold").text("VALIDITE:", 50, 160);
-    doc.fontSize(12).font("Helvetica").text("30 jours", 150, 160);
+    doc.fontSize(12).font("Helvetica-Bold").text("VALIDITE:", 50, detailsY + 40);
+    doc.fontSize(12).font("Helvetica").text("30 jours", 150, detailsY + 40);
 
     // Client Information Section (Right side)
-    doc.rect(350, 120, 200, 80).stroke();
-    // Client Information Section (Right side)
-    doc.rect(350, 120, 200, 100).stroke(); // Extended height to fit all info
+    const clientBoxX = 350;
+    const clientBoxY = detailsY;
+    doc.rect(clientBoxX, clientBoxY, 200, 100).stroke();
 
     // CLIENT title
     doc
       .fontSize(12)
       .font("Helvetica-Bold")
       .fillColor("red")
-      .text("CLIENT:", 360, 125);
+      .text("CLIENT:", clientBoxX + 10, clientBoxY + 5);
 
     // Reset font and color for client data
     doc.fontSize(10).font("Helvetica").fillColor("black");
 
     // Client Name (just under "CLIENT:")
-    doc.text(bill.Client.name, 360, 140);
+    doc.text(bill.Client.name, clientBoxX + 10, clientBoxY + 20);
 
     // Client Phone (under name)
-    doc.text(bill.Client.phone, 360, 155);
+    doc.text(bill.Client.phone, clientBoxX + 10, clientBoxY + 35);
 
-    // Client Code (move this part lower)
-    doc.font("Helvetica-Bold").text("CODE CLIENT:", 360, 175);
-    doc.font("Helvetica").text(bill.Client.code, 440, 175);
+    // Fiscal Matricule
+    doc.font("Helvetica-Bold").text("M.F :", clientBoxX + 10, clientBoxY + 55);
+    doc.font("Helvetica").text("", clientBoxX + 40, clientBoxY + 55);
+
+    // Client Code
+    doc.font("Helvetica-Bold").text("CODE CLIENT:", clientBoxX + 10, clientBoxY + 75);
+    doc.font("Helvetica").text(bill.Client.code, clientBoxX + 90, clientBoxY + 75);
 
     // Items Table
-    const tableTop = 220;
+    const tableTop = detailsY + 120;
     const colX = [50, 110, 360, 440];
 
     // Table headers
@@ -403,6 +430,21 @@ const generateBillPDF = async (req, res) => {
       .font("Helvetica-Oblique")
       .fillColor("red")
       .text("MERCI POUR VOTRE CONFIANCE !", 200, totalsY + 130);
+
+    // Company contact information
+    doc
+      .fontSize(8)
+      .font("Helvetica")
+      .fillColor("black")
+      .text("BIAT belvue:", 50, totalsY + 150);
+    doc
+      .fontSize(8)
+      .font("Helvetica")
+      .text("R.C: ...... Tunis-T.V.A: 608 154 SAC000.RUE SALAH EDDIN", 50, totalsY + 165);
+    doc
+      .fontSize(8)
+      .font("Helvetica")
+      .text("TEI :", 50, totalsY + 180);
 
     console.log("PDF generation completed for bill:", bill.id);
 
